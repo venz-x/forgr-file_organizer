@@ -7,7 +7,7 @@ from engine import copy_files_by_extensions
 
 class ForgrShell(cmd.Cmd):
     intro = "\n" + "="*40 + "\nWelcome to FORGR.\nType 'help' or '?' to list commands.\n" + "="*40
-    prompt = "forgr > "
+    prompt = "forgr> "
 
     ext_groups = {
         "images": imgs_ext,
@@ -61,3 +61,15 @@ class ForgrShell(cmd.Cmd):
         copy_files_by_extensions(s_folder, d_folder, self.ext_groups[ex_type])
         print("\n[*] Process Complete.")
 
+
+    def do_exit(self, arg):
+        """Exit the FORGR."""
+        print("-----------------")
+        return True  
+
+    def emptyline(self):
+        pass
+
+
+if __name__ == "__main__":
+    ForgrShell().cmdloop()
