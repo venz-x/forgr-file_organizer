@@ -2,14 +2,42 @@
 
 import cmd
 import shlex
+import argparse
+import sys
+import os
+
+# look at right file
+SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(SCRIPT_DIR)
 
 from extension import docs_ext, imgs_ext, archive_ext,bin_ext, bak_ext, audio_ext, code_ext, db_ext, lib_ext,pkg_ext, video_ext, web_ext
 
 from engine import copy_files_by_extensions
 
 class ForgrShell(cmd.Cmd):
-    intro = "\n" + "="*40 + "\nWelcome to FORGR.\nType 'help' or '?' to list commands.\n" + "="*40
-    prompt = "forgr> "
+    RED = "\033[91m"
+    GREEN = "\033[92m"
+    YELLOW = "\033[93m"
+    CYAN = "\033[96m"
+    RESET = "\033[0m"
+
+
+    logo = r"""
+                            _  .-')              _  .-')   
+                       ( \( -O )            ( \( -O )  
+   ,------. .-'),-----. ,------.   ,----.    ,------.  
+('-| _.---'( OO'  .-.  '|   /`. ' '  .-./-') |   /`. ' 
+(OO|(_\    /   |  | |  ||  /  | | |  |_( O- )|  /  | | 
+/  |  '--. \_) |  |\|  ||  |_.' | |  | .--, \|  |_.' | 
+\_)|  .--'   \ |  | |  ||  .  '.'(|  | '. (_/|  .  '.' 
+  \|  |_)     `'  '-'  '|  |\  \  |  '--'  | |  |\  \  
+   `--'         `-----' `--' '--'  `------'  `--' '--' 
+
+    """
+
+    intro = f"{CYAN}{logo}{RESET}\n" + "="*40 + "\nWelcome to FORGR.\nType 'help' or '?' to list commands.\n" + "="*40
+    
+    prompt = f"{GREEN}forgr>{RESET} "
 
     ext_groups = {
         "images": imgs_ext,
@@ -51,7 +79,7 @@ class ForgrShell(cmd.Cmd):
             return
         
         if ex_type not in self.ext_groups:
-            print(f"[-] Error: You are using Unknown extension type '{ex_type}'.")
+            print(f"[-] Error: Unknown extension type '{ex_type}'.")
             print(f"    Available types: {', '.join(self.ext_groups.keys())}")
             return
         
@@ -74,4 +102,33 @@ class ForgrShell(cmd.Cmd):
 
 
 if __name__ == "__main__":
-    ForgrShell().cmdloop()
+    # Setup the Argument Parser with RawTextHelpFormatter
+    parser = argparse.ArgumentParser(
+        prog="forgr",
+        description="FORGR: A fast and interactive file organizer.",
+        formatter_class=argparse.RawTextHelpFormatter,
+        epilog="""
+Usage Examples:
+--------------------------------
+Syntax: 
+  run s="<source_dir>" d="<dest_dir>" ex="<extension_group>"
+
+Available Extension Groups:
+  images, docs, code, web, audio, video, archives, binaries, packages, libraries, database, backup
+        """
+    )
+
+    parser.add_argument(
+        '-v', '--version', 
+        action='version', 
+        version='%(prog)s v1.0.0'
+    )
+
+    args = parser.parse_args()
+
+
+    try:
+        ForgrShell().cmdloop()
+    except KeyboardInterrupt:
+        print("\n\n[*] --------- ")
+        sys.exit(0)
